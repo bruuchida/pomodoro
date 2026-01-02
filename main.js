@@ -1,5 +1,5 @@
 let countdownInterval
-const timerMax = 5
+const timerMax = 10
 let timeLeft = timerMax
 const display = document.getElementById('timer')
 
@@ -10,8 +10,8 @@ const startButton = document.getElementById('button-start')
 const pauseButton = document.getElementById('button-pause')
 const resetButton = document.getElementById('button-reset')
 
-
 updateDisplay()
+
 showStartButton()
 
 function updateDisplay() {
@@ -26,8 +26,10 @@ function startTimer() {
     }
 
     updateDisplay()
+
     changeTomatoFace('surprised')
     changeBallon('start')
+
     startButton.style.display = 'none'
     pauseButton.style.display = 'block'
     resetButton.style.display = 'block'
@@ -37,17 +39,15 @@ function startTimer() {
             clearInterval(countdownInterval)
             countdownInterval = null
             display.textContent = "00:00"
-            changeTomatoFace('happy')
-            changeBallon('ready')
 
-            startButton.style.display = 'none'
-            pauseButton.style.display = 'none'
-            resetButton.style.display = 'block'
+            tomatoReady()
         } else {
             timeLeft--
             updateDisplay()
+
             changeTomatoFace('start')
-            hideBallon()
+            ballonIsVisible(false)
+            tomatoIsWaiting(true)
         }
     }, 1000);
 }
@@ -55,49 +55,87 @@ function startTimer() {
 function pauseTimer() {
     clearInterval(countdownInterval)
     countdownInterval = null
+
     changeTomatoFace('serious')
     changeBallon('pause')
+    tomatoIsWaiting(false)
+
     startButton.style.display = 'block'
     pauseButton.style.display = 'none'
     resetButton.style.display = 'block'
+
     setTimeout(() => {
-        hideBallon()
+        ballonIsVisible(false)
     }, 1000)
 }
 
 function resetTimer() {
     changeTomatoFace('surprised')
     changeBallon('reset')
+    tomatoIsJumping(false)
+    tomatoIsWaiting(false)
+
     clearInterval(countdownInterval)
     countdownInterval = null
     timeLeft = timerMax
+
     updateDisplay()
+
     showStartButton()
     setTimeout(() => {
         changeTomatoFace('start')
-        hideBallon()
+        ballonIsVisible(false)
     }, 1000)
 }
 
 function changeTomatoFace(newFace) {
-    tomato.setAttribute("src", `./tomato-${newFace}.svg`)
+    tomato.setAttribute("src", `./icons/tomato-${newFace}.svg`)
 }
 
 function changeBallon(ballonType) {
-    ballon.setAttribute("src", `./ballon-${ballonType}.svg`)
-    showBallon()
+    ballon.setAttribute("src", `./icons/ballon-${ballonType}.svg`)
+    ballonIsVisible(true)
 }
 
-function hideBallon(){
+function ballonIsVisible(status){
+    if (status) {
+        ballon.classList.remove('ballon-hide')
+        return
+    }
     ballon.classList.add('ballon-hide')
-}
-
-function showBallon() {
-    ballon.classList.remove('ballon-hide')
 }
 
 function showStartButton() {
     startButton.style.display = 'block'
     pauseButton.style.display = 'none'
     resetButton.style.display = 'none'
+}
+
+function tomatoIsJumping(status) {
+    if (status) {
+        tomato.classList.add('jump')
+        return
+    }
+
+    tomato.classList.remove('jump')    
+}
+
+function tomatoIsWaiting(status) {
+    if (status) {
+        tomato.classList.add('waiting')
+        return
+    }
+
+    tomato.classList.remove('waiting')    
+}
+
+function tomatoReady() {
+    tomatoIsWaiting(false)
+    changeTomatoFace('happy')
+    changeBallon('ready')
+    tomatoIsJumping(true)
+
+    startButton.style.display = 'none'
+    pauseButton.style.display = 'none'
+    resetButton.style.display = 'block'
 }
