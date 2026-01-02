@@ -1,0 +1,106 @@
+body {
+    margin: 0;
+    background: #47B366;
+    color: #FFF;
+    font-family: "Nerko One", cursive;
+    font-weight: 400;
+    font-style: normal;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+h1 {
+    margin: 0;
+    text-align: center;
+    font-size: 40px;
+    padding: 60px 0;
+}
+
+.container {
+    display: grid;
+    justify-items: center;
+    gap: 20px;
+    
+    @media (min-width: 576px) {
+        width: 500px;
+    }
+}
+
+.tomato {
+    width: 160px;
+    height: 160px;
+    position: relative;
+}
+
+.tomato::before {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    right: 20px;
+    z-index: -1;
+    background: #444;
+    width: 130px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.ballon {
+    position: absolute;
+    transform: scale(1.5);
+    margin-left: 10px;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+}
+
+.ballon-hide {
+    opacity: 0;
+}
+
+.timer {
+    font-size: 40px;
+}
+
+.actions {
+    display: flex; 
+    flex-direction: column;
+    gap: 20px;
+
+    @media (min-width: 576px) {
+        flex-direction: row;
+        height: 44px;
+    }
+}
+
+button {
+    width: 100px;
+    height: 36px;
+    border: 0;
+    box-shadow: 0 4px 4px 0 rgb(0 0 0 / 25%);
+    border-radius: 8px;
+    color: #FFF;
+    font-family: "Nerko One", cursive;
+    font-size: 20px;
+}
+
+.button__start {
+    background: #0CC942;
+    transition: scale 0.2s ease;
+}
+
+.button__pause {
+    background: #DD3C20;
+    transition: scale 0.2s ease;
+    display: none;
+}
+
+.button__reset {
+    background: #DDA420;
+    transition: scale 0.2s ease;
+    display: none;
+}
+
+.button__start:active, .button__pause:active, .button__reset:active {
+    transform: scale(0.90);
+}
