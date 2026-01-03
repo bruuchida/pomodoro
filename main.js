@@ -1,5 +1,5 @@
 let countdownInterval
-const timerMax = 10
+const timerMax = 5
 let timeLeft = timerMax
 const display = document.getElementById('timer')
 
@@ -9,6 +9,8 @@ const ballon = document.getElementById('ballon')
 const startButton = document.getElementById('button-start')
 const pauseButton = document.getElementById('button-pause')
 const resetButton = document.getElementById('button-reset')
+
+const audio = new Audio('./beep-alarm.mp3');
 
 updateDisplay()
 
@@ -70,6 +72,8 @@ function pauseTimer() {
 }
 
 function resetTimer() {
+    audio.pause()
+
     changeTomatoFace('surprised')
     changeBallon('reset')
     tomatoIsJumping(false)
@@ -138,4 +142,8 @@ function tomatoReady() {
     startButton.style.display = 'none'
     pauseButton.style.display = 'none'
     resetButton.style.display = 'block'
+
+    audio.volume = 0.5
+    audio.loop = true
+    audio.play()
 }
