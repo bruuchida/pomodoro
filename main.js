@@ -1,5 +1,5 @@
 let countdownInterval
-const timerMax = 5
+const timerMax = 1500
 let timeLeft = timerMax
 
 const elements = {
