@@ -129,7 +129,10 @@ button {
     transform: scale(0.90);
 }
 
-
 .footer {
     padding: 20px 0;
+}
+
+a {
+    cursor: url('./icons/cursor-hover.svg'), pointer;
 }

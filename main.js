@@ -1,25 +1,57 @@
 let countdownInterval
 const timerMax = 5
 let timeLeft = timerMax
-const display = document.getElementById('timer')
 
-const tomato = document.getElementById('tomato')
-const ballon = document.getElementById('ballon')
+const elements = {
+    display: document.getElementById('timer'),
+    tomato: document.getElementById('tomato'),
+    ballon: document.getElementById('ballon'),
+    startBtn: document.getElementById('button-start'),
+    pauseBtn: document.getElementById('button-pause'),
+    resetBtn: document.getElementById('button-reset')
+};
 
-const startButton = document.getElementById('button-start')
-const pauseButton = document.getElementById('button-pause')
-const resetButton = document.getElementById('button-reset')
+const audio = new Audio('./beep-alarm.mp3')
+audio.volume = 0.8
+audio.loop = true
 
-const audio = new Audio('./beep-alarm.mp3');
+updateButtonStates('start')
 
-updateDisplay()
+function updateButtonStates(state) {
 
-showStartButton()
+     const buttonStates = {
+        start: [true, false, false],
+        running: [false, true, true],
+        paused:  [true, false, true],
+        ready: [false, false, true]
+    }
+
+    const [start, pause, reset] = buttonStates[state]
+    elements.startBtn.style.display = start ? 'block' : 'none'
+    elements.pauseBtn.style.display = pause ? 'block' : 'none'
+    elements.resetBtn.style.display = reset ? 'block' : 'none'
+
+    updateDisplay()
+}
+
+function updateTomatoState(face, ballon, jumping = false, waiting = false) {
+    elements.tomato.src = `./icons/tomato-${face}.svg`
+    elements.tomato.classList.toggle('jump', jumping)
+    elements.tomato.classList.toggle('waiting', waiting)
+
+    if (ballon) {
+        elements.ballon.src = `./icons/ballon-${ballon}.svg`
+        elements.ballon.classList.remove('ballon-hide')
+    } else {
+        elements.ballon.classList.add('ballon-hide')
+    }
+}
+
 
 function updateDisplay() {
     const minutes = Math.floor(timeLeft / 60)
     const seconds = Math.floor(timeLeft % 60)
-    display.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
+    elements.display.textContent = `${minutes < 10 ? '0' : ''}${minutes}:${seconds < 10 ? '0' : ''}${seconds}`
 }
 
 function startTimer() {
@@ -29,121 +61,50 @@ function startTimer() {
 
     updateDisplay()
 
-    changeTomatoFace('surprised')
-    changeBallon('start')
-
-    startButton.style.display = 'none'
-    pauseButton.style.display = 'block'
-    resetButton.style.display = 'block'
+    updateTomatoState('surprised', 'start')
+    updateButtonStates('running')
 
     countdownInterval = setInterval(() => {
         if (timeLeft <= 0) {
             clearInterval(countdownInterval)
             countdownInterval = null
-            display.textContent = "00:00"
+            elements.display.textContent = "00:00"
 
-            tomatoReady()
+            updateTomatoState('ready', 'ready', true, false)
+            updateButtonStates('ready')
+
+            audio.play()
         } else {
             timeLeft--
             updateDisplay()
-
-            changeTomatoFace('start')
-            ballonIsVisible(false)
-            tomatoIsWaiting(true)
+            updateTomatoState('start', null, false, true)
         }
     }, 1000);
 }
 
 function pauseTimer() {
-    clearInterval(countdownInterval)
-    countdownInterval = null
+    stopInterval()
 
-    changeTomatoFace('serious')
-    changeBallon('pause')
-    tomatoIsWaiting(false)
+    updateTomatoState('pause', 'pause', false, false)
+    updateButtonStates('paused')
 
-    startButton.style.display = 'block'
-    pauseButton.style.display = 'none'
-    resetButton.style.display = 'block'
-
-    setTimeout(() => {
-        ballonIsVisible(false)
-    }, 1000)
+    setTimeout(() => elements.ballon.classList.add('ballon-hide'), 1000)
 }
 
 function resetTimer() {
+    stopInterval()
+    timeLeft = timerMax
     audio.pause()
 
-    changeTomatoFace('surprised')
-    changeBallon('reset')
-    tomatoIsJumping(false)
-    tomatoIsWaiting(false)
-
-    clearInterval(countdownInterval)
-    countdownInterval = null
-    timeLeft = timerMax
+    updateTomatoState('surprised', 'reset', false, false)    
 
     updateDisplay()
 
-    showStartButton()
-    setTimeout(() => {
-        changeTomatoFace('start')
-        ballonIsVisible(false)
-    }, 1000)
+    updateButtonStates('start')
+    setTimeout(() => updateTomatoState('start', null), 1000)
 }
 
-function changeTomatoFace(newFace) {
-    tomato.setAttribute("src", `./icons/tomato-${newFace}.svg`)
-}
-
-function changeBallon(ballonType) {
-    ballon.setAttribute("src", `./icons/ballon-${ballonType}.svg`)
-    ballonIsVisible(true)
-}
-
-function ballonIsVisible(status){
-    if (status) {
-        ballon.classList.remove('ballon-hide')
-        return
-    }
-    ballon.classList.add('ballon-hide')
-}
-
-function showStartButton() {
-    startButton.style.display = 'block'
-    pauseButton.style.display = 'none'
-    resetButton.style.display = 'none'
-}
-
-function tomatoIsJumping(status) {
-    if (status) {
-        tomato.classList.add('jump')
-        return
-    }
-
-    tomato.classList.remove('jump')    
-}
-
-function tomatoIsWaiting(status) {
-    if (status) {
-        tomato.classList.add('waiting')
-        return
-    }
-
-    tomato.classList.remove('waiting')    
-}
-
-function tomatoReady() {
-    tomatoIsWaiting(false)
-    changeTomatoFace('happy')
-    changeBallon('ready')
-    tomatoIsJumping(true)
-
-    startButton.style.display = 'none'
-    pauseButton.style.display = 'none'
-    resetButton.style.display = 'block'
-
-    audio.volume = 0.5
-    audio.loop = true
-    audio.play()
+function stopInterval() {
+    clearInterval(countdownInterval);
+    countdownInterval = null;
 }
